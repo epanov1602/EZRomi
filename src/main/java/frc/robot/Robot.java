@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous mode. */
   @Override
   public void autonomousPeriodic() {
-    double targetX = m_camera.getX();
+    double targetX = m_camera.getX(); // do we see the target? what is its X?
     if (targetX > 5) {
       System.out.println("target is to our right => turning right: x=" + targetX);
       m_drivetrain.m_leftMotor.set(0.2);
@@ -87,10 +87,15 @@ public class Robot extends TimedRobot {
       m_drivetrain.m_leftMotor.set(-0.2);
       m_drivetrain.m_rightMotor.set(0.2);
     }
-    else {
-      // otherwise do not turn anywhere
+    else if (Double.isFinite(targetX)) {
+      // we see the target, but don't need to turn left or right; maybe change the code to chase it?
       m_drivetrain.m_leftMotor.set(0);
       m_drivetrain.m_rightMotor.set(0);
+    }
+    else {
+      // we do not see the target => stop
+      m_drivetrain.m_leftMotor.set(0);
+      m_drivetrain.m_rightMotor.set(0);     
     }
   }
 
