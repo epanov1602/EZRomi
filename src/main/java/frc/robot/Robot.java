@@ -37,7 +37,11 @@ public class Robot extends TimedRobot {
       m_drivetrain.m_leftMotor.set(0.8);
       m_drivetrain.m_rightMotor.set(0.8);
     }
-    else {
+    else if (m_joystick.getRawButton(1)) {
+      System.out.println("button 4 pressed => going backward at 80% speed");
+      m_drivetrain.m_leftMotor.set(-0.5);
+      m_drivetrain.m_rightMotor.set(-0.5);
+    } else {
       System.out.println("none of those buttons pressed => not moving");
       m_drivetrain.m_leftMotor.set(0);
       m_drivetrain.m_rightMotor.set(0);
@@ -52,11 +56,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     // here we will not use buttons, we will use stick input, also known as "axis" input
-    double forwardSpeed = -m_joystick.getRawAxis(5); // 1.0 means "full forward", -1.0 means "full reverse"
-    double rotationSpeed = m_joystick.getRawAxis(0);
+    double forwardSpeed = -m_joystick.getRawAxis(1); // 1.0 means "full forward", -1.0 means "full reverse"
+    double rotationSpeed = m_joystick.getRawAxis(4);
 
-    double leftMotorSpeed = forwardSpeed + rotationSpeed; // if we are turning with positive rotation speed, left motor spins a bit faster
-    double rightMotorSpeed = forwardSpeed - rotationSpeed; // if we are turning with positive rotation speed, right motor spins a bit slower
+    double leftMotorSpeed = forwardSpeed + 0.5 * rotationSpeed; // if we are turning with positive rotation speed, left motor spins a bit faster
+    double rightMotorSpeed = forwardSpeed - 0.5* rotationSpeed; // if we are turning with positive rotation speed, right motor spins a bit slower
 
     // the highest positive motor speed is 1.0 (which means 100%), make sure we do not break this speed limit
     if (leftMotorSpeed > 1) leftMotorSpeed = 1;
@@ -77,20 +81,20 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     double targetX = m_camera.getX(); // do we see the target? what is its X?
-    if (targetX > 5) {
+    if (targetX > 7) {
       System.out.println("target is to our right => turning right: x=" + targetX);
-      m_drivetrain.m_leftMotor.set(0.2);
-      m_drivetrain.m_rightMotor.set(-0.2);
+      m_drivetrain.m_leftMotor.set(0.1);
+      m_drivetrain.m_rightMotor.set(-0.1);
     }
-    else if (targetX < -5) {
+    else if (targetX < -7) {
       System.out.println("target is to our left => turning left: x=" + targetX);
-      m_drivetrain.m_leftMotor.set(-0.2);
-      m_drivetrain.m_rightMotor.set(0.2);
+      m_drivetrain.m_leftMotor.set(-0.1);
+      m_drivetrain.m_rightMotor.set(0.1);
     }
     else if (targetX != 0) {
       // we see the target, but don't need to turn left or right; maybe change the code to chase it?
-      m_drivetrain.m_leftMotor.set(0.3);
-      m_drivetrain.m_rightMotor.set(0.3);
+      m_drivetrain.m_leftMotor.set(0.8);
+      m_drivetrain.m_rightMotor.set(0.8);
     }
     else {
       // we do not see the target => stop
