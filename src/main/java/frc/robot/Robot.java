@@ -87,10 +87,10 @@ public class Robot extends TimedRobot {
       m_drivetrain.m_leftMotor.set(-0.2);
       m_drivetrain.m_rightMotor.set(0.2);
     }
-    else if (Double.isFinite(targetX)) {
+    else if (targetX != 0) {
       // we see the target, but don't need to turn left or right; maybe change the code to chase it?
-      m_drivetrain.m_leftMotor.set(0);
-      m_drivetrain.m_rightMotor.set(0);
+      m_drivetrain.m_leftMotor.set(0.3);
+      m_drivetrain.m_rightMotor.set(0.3);
     }
     else {
       // we do not see the target => stop

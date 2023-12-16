@@ -21,9 +21,9 @@ public class RomiLimelight {
   protected NetworkTable m_table;
   private NetworkTableEntry m_tx, m_ty, m_ta, m_pipeline;
 
-  public double getX() { return m_tx.getDouble(Double.NaN); }
-  public double getY() { return m_ty.getDouble(Double.NaN); }
-  public double getA() { return m_ta.getDouble(Double.NaN); }
+  public double getX() { return m_tx.getDouble(0.0); }
+  public double getY() { return m_ty.getDouble(0.0); }
+  public double getA() { return m_ta.getDouble(0.0); }
 
   public int getPipeline() { return (int)m_pipeline.getDouble(-1); }
   public void setPipeline(int pipeline) { m_pipeline.setDouble(pipeline); }
