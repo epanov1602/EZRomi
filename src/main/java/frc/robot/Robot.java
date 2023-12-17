@@ -34,8 +34,8 @@ public class Robot extends TimedRobot {
     }
     else if (m_joystick.getRawButton(4)) {
       System.out.println("button 4 pressed => going forward at 80% speed");
-      m_drivetrain.m_leftMotor.set(0.8);
-      m_drivetrain.m_rightMotor.set(0.8);
+      m_drivetrain.m_leftMotor.set(0.2);
+      m_drivetrain.m_rightMotor.set(0.2);
     }
     else if (m_joystick.getRawButton(1)) {
       System.out.println("button 4 pressed => going backward at 80% speed");
@@ -59,8 +59,8 @@ public class Robot extends TimedRobot {
     double forwardSpeed = -m_joystick.getRawAxis(1); // 1.0 means "full forward", -1.0 means "full reverse"
     double rotationSpeed = m_joystick.getRawAxis(4);
 
-    double leftMotorSpeed = forwardSpeed + 0.5 * rotationSpeed; // if we are turning with positive rotation speed, left motor spins a bit faster
-    double rightMotorSpeed = forwardSpeed - 0.5* rotationSpeed; // if we are turning with positive rotation speed, right motor spins a bit slower
+    double leftMotorSpeed = forwardSpeed + 0.3 * rotationSpeed; // if we are turning with positive rotation speed, left motor spins a bit faster
+    double rightMotorSpeed = forwardSpeed - 0.3* rotationSpeed; // if we are turning with positive rotation speed, right motor spins a bit slower
 
     // the highest positive motor speed is 1.0 (which means 100%), make sure we do not break this speed limit
     if (leftMotorSpeed > 1) leftMotorSpeed = 1;
