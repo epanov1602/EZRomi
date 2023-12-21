@@ -7,8 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import frc.robot.sensors.RomiGyro;
 
-public class RomiDrivetrain {
+public class RomiDrivetrain implements Drivetrain {
   private static final double kCountsPerRevolution = 1440.0;
   private static final double kWheelDiameterInch = 2.75591; // 70 mm
 
@@ -21,6 +22,7 @@ public class RomiDrivetrain {
   // to use DIO pins 4/5 and 6/7 for the left and right
   private final Encoder m_leftEncoder = new Encoder(4, 5);
   private final Encoder m_rightEncoder = new Encoder(6, 7);
+  private final RomiGyro m_gyro = new RomiGyro();
 
   // Set up the differential drive controller
   private final DifferentialDrive m_diffDrive = new DifferentialDrive(m_leftMotor, m_rightMotor);
@@ -53,5 +55,9 @@ public class RomiDrivetrain {
 
   public double getRightDistanceInch() {
     return m_rightEncoder.getDistance();
+  }
+
+  public double getAngleZDegrees() {
+    return m_gyro.getAngleZ();
   }
 }
