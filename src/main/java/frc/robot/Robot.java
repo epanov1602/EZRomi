@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -22,23 +21,44 @@ public class Robot extends TimedRobot {
   private final Stopwatch m_stopwatch = new Stopwatch();
 
 
-  /** This function is called once when autonomous mode is enabled. */
-  @Override
-  public void autonomousInit() {
-    m_stopwatch.onStartedRacing();
-    m_odometry.resetPosition(new Rotation2d(0), 0, 0, new Pose2d());
-    m_drivetrain.resetEncoders();
-  }
+  // at the start we assume that we have not reached targets yet
+  private boolean reachedTarget0 = false;
+  private boolean reachedTarget1 = false;
+  private boolean reachedTarget2 = false;
 
 
   /** This function is called periodically during autonomous mode. */
   @Override
   public void autonomousPeriodic() {
+    // if we have not reached target0, work on that
+    if (reachedTarget0 == false) {
+      boolean gotThere = getToTarget(Constants.AutonomousTargetX0, Constants.AutonomousTargetY0);
+      if (gotThere == true)
+        reachedTarget0 = true;
+    }
+    
+    // otherwise if we have not reached target1, work on that
+    else if (reachedTarget1 == false) {
+      boolean gotThere = getToTarget(Constants.AutonomousTargetX1, Constants.AutonomousTargetY1);
+      if (gotThere) /* this is same thing as saying: if (gotThere == true) */
+        reachedTarget1 = true;
+    }
 
-    // -- where do we want to go?
-    double targetX = Constants.AutonomousTargetX;
-    double targetY = Constants.AutonomousTargetY;
+    // otherwise if we have not reached target2, work on that
+    else if (reachedTarget2 == false) {
+      boolean gotThere = getToTarget(Constants.AutonomousTargetX2, Constants.AutonomousTargetY2);
+      if (gotThere == true)
+        reachedTarget2 = true;
+    }
 
+    // else looks like we reached all the targets, hit the stopwatch
+    else {
+      m_stopwatch.onFinished();
+    }
+  }
+
+
+  public boolean getToTarget(double targetX, double targetY) {
     // -- where are we now?
     Pose2d position = m_odometry.getPoseMeters();
     double currentX = position.getX();
@@ -47,11 +67,9 @@ public class Robot extends TimedRobot {
     // -- maybe we have finished?
     double distanceToTarget = Math.sqrt( (currentX - targetX) * (currentX - targetX) + (currentY - targetY) * (currentY - targetY) );
     if (distanceToTarget <= Constants.AutonomousTargetRadius) {
-      // stop the motors and "return" from the function (this means, don't execute any lines after the "return" line)
-      m_stopwatch.onFinished();
       m_drivetrain.m_leftMotor.set(0);
       m_drivetrain.m_rightMotor.set(0);
-      return;
+      return true; // this means set gotThere=true, because we got there
     }
 
     // -- not finished yet, need to drive
@@ -84,7 +102,20 @@ public class Robot extends TimedRobot {
       m_drivetrain.m_leftMotor.set(0);
       m_drivetrain.m_rightMotor.set(0);
     }
+
+    return false; // this means set gotThere=false, because we did not get there yet
   }
+
+
+
+  /** This function is called once when autonomous mode is enabled. */
+  @Override
+  public void autonomousInit() {
+    m_stopwatch.onStartedRacing();
+    m_odometry.resetPosition(new Rotation2d(0), 0, 0, new Pose2d());
+    m_drivetrain.resetEncoders();
+  }
+
 
 
   /** This function is called periodically during teleoperated mode. */
