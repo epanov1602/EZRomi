@@ -31,4 +31,8 @@ public class SimulatedDrivetrain implements Drivetrain {
         double radians = (m_leftDistance - m_rightDistance) / 14.0; // assuming distance between wheels is 14 inches
         return 57.29 * radians;
     }
+
+    public void arcadeDrive(double forwardSpeed, double rotationSpeed) {
+        // do nothing: this is a simulated drivetrain 
+    }
 }

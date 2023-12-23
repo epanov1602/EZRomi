@@ -7,6 +7,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.trajectories.CheckersTrajectoryGenerator;
 
 
 
@@ -19,6 +20,8 @@ public class Robot extends TimedRobot {
 
   private final NetworkTable m_reportedOdometry = NetworkTableInstance.getDefault().getTable("odometry");
   private final Stopwatch m_stopwatch = new Stopwatch();
+
+  private final CheckersTrajectoryGenerator m_trajectoryGenerator = new CheckersTrajectoryGenerator();
 
 
   // at the start we assume that we have not reached targets yet
@@ -33,22 +36,28 @@ public class Robot extends TimedRobot {
     // if we have not reached target0, work on that
     if (reachedTarget0 == false) {
       boolean gotThere = getToTarget(Constants.AutonomousTargetX0, Constants.AutonomousTargetY0);
-      if (gotThere == true)
+      if (gotThere == true) {
+        System.out.println("Target 0 reached");
         reachedTarget0 = true;
+      }
     }
     
     // otherwise if we have not reached target1, work on that
     else if (reachedTarget1 == false) {
       boolean gotThere = getToTarget(Constants.AutonomousTargetX1, Constants.AutonomousTargetY1);
-      if (gotThere) /* this is same thing as saying: if (gotThere == true) */
+      if (gotThere) {
         reachedTarget1 = true;
+        System.out.println("Target 1 reached");
+      }
     }
 
     // otherwise if we have not reached target2, work on that
     else if (reachedTarget2 == false) {
       boolean gotThere = getToTarget(Constants.AutonomousTargetX2, Constants.AutonomousTargetY2);
-      if (gotThere == true)
+      if (gotThere == true) {
         reachedTarget2 = true;
+        System.out.println("Target 2 reached");
+      }
     }
 
     // else looks like we reached all the targets, hit the stopwatch
@@ -72,37 +81,8 @@ public class Robot extends TimedRobot {
       return true; // this means set gotThere=true, because we got there
     }
 
-    // -- not finished yet, need to drive
-    double currentHeading = position.getRotation().getDegrees();
-    if (currentY < targetY) {
-      // step 1: if our Y is under targetY, aim for heading around 80-90 degrees (go East) until currentY > targetY
-
-      if (currentHeading < 80) {
-        m_stopwatch.setStatusText("turning right...");
-        m_drivetrain.m_leftMotor.set(0.1);
-        m_drivetrain.m_rightMotor.set(-0.1);
-        // or one can write it in one line by saying: m_drivetrain.arcadeDrive(0.0, 0.1);
-      } else {
-        m_stopwatch.setStatusText("going East...");
-        m_drivetrain.m_leftMotor.set(0.5);
-        m_drivetrain.m_rightMotor.set(0.53); // if the right motor is a bit weaker, it needs stronger signal to make sure the vehicle goes straight
-        // or one can write it in one line by saying: m_drivetrain.arcadeDrive(0.5, 0);
-      }
-
-    }
-    else if (currentX < targetX) {
-      // case 2: reached our targetY, but not targetX
-      m_stopwatch.setStatusText("reached targetY but not targetX, not sure what to do next; just stopping");
-      m_drivetrain.m_leftMotor.set(0);
-      m_drivetrain.m_rightMotor.set(0);
-    }
-    else {
-      // case 3: not sure why we ended up here, stop to be safe
-      m_stopwatch.setStatusText("unsure how we got here");
-      m_drivetrain.m_leftMotor.set(0);
-      m_drivetrain.m_rightMotor.set(0);
-    }
-
+    // -- not finished yet, make the next step
+    m_trajectoryGenerator.getNextStep(position, targetX, targetY, m_drivetrain, m_stopwatch);
     return false; // this means set gotThere=false, because we did not get there yet
   }
 

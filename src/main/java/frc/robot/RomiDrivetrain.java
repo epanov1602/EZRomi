@@ -40,8 +40,8 @@ public class RomiDrivetrain implements Drivetrain {
     m_diffDrive.setSafetyEnabled(false);
   }
 
-  public void arcadeDrive(double xaxisSpeed, double zaxisRotate) {
-    m_diffDrive.arcadeDrive(xaxisSpeed, zaxisRotate);
+  public void arcadeDrive(double xaxisSpeed, double rotationSpeed) {
+    m_diffDrive.arcadeDrive(xaxisSpeed, rotationSpeed);
   }
 
   public void resetEncoders() {
