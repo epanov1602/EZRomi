@@ -150,9 +150,13 @@ public class Robot extends TimedRobot {
     m_reportedOdometry.getEntry("heading").setDouble(position.getRotation().getDegrees());
   }
 
+  RobotHttpResponder m_http = new RobotHttpResponder(8080);
+
   /** This function is run when the robot is first started up. */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    m_http.start();    
+  }
 
   /** This function is called once when teleop mode is enabled. */
   @Override
