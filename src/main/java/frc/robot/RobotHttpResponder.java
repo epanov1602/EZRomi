@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 
 /** Simple HTTP Responder for a robot */
 public class RobotHttpResponder extends Thread {
+    // maybe we will want to disable the server when robot is actively driving, to conserve the CPU cycles
+    public boolean m_disabled = false;
 
     // please set these in robotPeriodic(), numbers only (no strings, otherwise questions about thread safety)
     public double m_battVoltage = Double.NaN;
@@ -25,6 +27,8 @@ public class RobotHttpResponder extends Thread {
             System.out.println("HTTP responder is listening on port " + m_port);
             while (true) {
                 Socket client = serverSocket.accept();
+                while (m_disabled)
+                    sleep(1000); // when disabled, try to not serve web pages
                 BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 String request = reader.readLine();
                 System.out.println("Request: " + request);
@@ -59,6 +63,10 @@ public class RobotHttpResponder extends Thread {
         } catch (IOException ex) {
             System.out.println("Server exception: " + ex.getMessage());
             ex.printStackTrace();
+        }
+        catch (InterruptedException e) {
+            System.out.println("Server interrupted: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
