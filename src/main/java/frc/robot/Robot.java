@@ -7,6 +7,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.sensors.RomiLimelight;
 
 
 
@@ -16,54 +17,61 @@ public class Robot extends TimedRobot {
   private final Joystick m_joystick = new Joystick(0);
   private final RomiDrivetrain m_drivetrain = new RomiDrivetrain();
   private final DifferentialDriveOdometry m_odometry = new DifferentialDriveOdometry(new Rotation2d(0), 0, 0);
+  private final RomiLimelight m_camera = new RomiLimelight();
 
   private final NetworkTable m_reportedOdometry = NetworkTableInstance.getDefault().getTable("odometry");
 
 
+
+  /** This function is called once when teleop mode is enabled. */
+  @Override
+  public void autonomousInit() {
+    m_camera.setPipeline(3);
+  }
+
   /** This function is called periodically during autonomous mode. */
   @Override
   public void autonomousPeriodic() {
-    // what does odometry say? (where are we now and where are we heading)
-    Pose2d position = m_odometry.getPoseMeters();
-    double currentHeading = position.getRotation().getDegrees();
-    double currentX = position.getX();
-    double currentY = position.getY();
+    double targetX = m_camera.getX();
+    double targetSize = m_camera.getA();
 
-    if (currentY < Constants.AutonomousTargetY) {
-      // step 1: if our Y is under TargetY, aim for heading around 80-90 degrees (go East) until currentY > TargetY
-
-      if (currentHeading < 90) {
-        // if our heading is not yet 90 degrees, keep turning right until that heading angle reaches 90 degrees
-        m_drivetrain.m_leftMotor.set(0.2);
-        m_drivetrain.m_rightMotor.set(-0.2);
-      } else {
-        // otherwise, clear to go forward
-        m_drivetrain.m_leftMotor.set(0.5);
-        m_drivetrain.m_rightMotor.set(0.5);
-      }
-
-    }
-    else if (currentX < Constants.AutonomousTargetX) {
-
-      // case 2: we have reached our target Y, but not X: what should I do here? please help!
-      // (for now, set motor speed to zero)
+    if (targetX == 0) {
+      System.out.println("I don't see the target anymore, not moving");
       m_drivetrain.m_leftMotor.set(0);
       m_drivetrain.m_rightMotor.set(0);
-
+    }
+    else if (targetSize > 6) {
+      // we are pretty close
+      System.out.println("not moving anymore, because the target is too big: size=" + targetSize);
+      m_drivetrain.m_leftMotor.set(0);
+      m_drivetrain.m_rightMotor.set(0);
+    }
+    else if (targetX > 2.0) {
+      System.out.println("targetX=" + targetX);
+      // to do: the target is to the right of us -- we must move forward while turning left
+    }
+    else if (targetX < -2.0) {
+      System.out.println("targetX=" + targetX);
+      // to do: the target is to the left of us -- we must move forward while turning left
     }
     else {
-
-      // case 3: we have reached or overshot, stop
+      System.out.println("nothing to do, so stopping: targetX=" + targetX + ", targetSize=" + targetSize);
       m_drivetrain.m_leftMotor.set(0);
       m_drivetrain.m_rightMotor.set(0);
-
     }
   }
 
 
+
+  /** This function is called once when teleop mode is enabled. */
+  @Override
+  public void teleopInit() {
+    m_camera.setPipeline(0);
+  }
+
   /** This function is called periodically during teleoperated mode. */
   @Override
-  public void teleopPeriodic() {
+  public void teleopPeriodic() {  
     // here we will not use buttons, we will use stick input, also known as "axis" input
     double forwardSpeed = -m_joystick.getRawAxis(1); // 1.0 means "full forward", -1.0 means "full reverse"
     double rotationSpeed = m_joystick.getRawAxis(4);
@@ -140,16 +148,6 @@ public class Robot extends TimedRobot {
   /** This function is run when the robot is first started up. */
   @Override
   public void robotInit() {}
-
-  /** This function is called once when autonomous mode is enabled. */
-  @Override
-  public void autonomousInit() {
-  }
-
-  /** This function is called once when teleop mode is enabled. */
-  @Override
-  public void teleopInit() {
-  }
 
   /** This function is called once when test mode is enabled. */
   @Override
